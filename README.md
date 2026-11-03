@@ -55,7 +55,7 @@ cmake --install build_x64 --config RelWithDebInfo --prefix <出力先>   # <出�
 
 ## 問い合わせ
 
-不具合の報告・要望は、このリポジトリの [Issues](https://github.com/konamuki0852/SmashNameBlur/issues) へどうぞ。相手の名前が写った画像や動画は貼らないでください。
+不具合の報告・要望は、このリポジトリの [Issues](https://github.com/konamuki0852/SmashNameBlur/issues) へどうぞ。
 
 ---
 

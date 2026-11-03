@@ -1,0 +1,26 @@
+{
+    "dependencies": {
+        "obs-studio": {
+            "version": "31.0.0",
+            "baseUrl": "https://github.com/obsproject/obs-studio/archive/refs/tags",
+            "label": "OBS sources",
+            "hashes": {
+                "windows-x64": "e8434dcee06f1702f0a0bbd1489296c77116fc51356835c3af4a6ed21b1e1c74"
+            }
+        },
+        "prebuilt": {
+            "version": "2024-09-12",
+            "baseUrl": "https://github.com/obsproject/obs-deps/releases/download",
+            "label": "Pre-Built obs-deps",
+            "hashes": {
+                "windows-x64": "d4a4f194591766891ad3c0b267deec3c4b85239c8fe557273559927456aeedbb"
+            }
+        }
+    },
+    "name": "blur-name",
+    "displayName": "BlurName",
+    "version": "1.1.0",
+    "author": "Konamuki",
+    "website": "https://github.com/konamuki0852/SmashNameBlur",
+    "email": ""
+}

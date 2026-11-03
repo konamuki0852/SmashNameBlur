@@ -1,0 +1,32 @@
+# 書式設定（app-init が敷設。C/C++ の詳細は plugin/.clang-format）
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{c,h,cpp,hpp,cc,cxx,in}]
+indent_style = tab
+indent_size = 8
+tab_width = 8
+max_line_length = 120
+
+[*.py]
+indent_size = 4
+
+[buildspec.json]
+indent_size = 4
+
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+
+[*.{bat,cmd}]
+# cmd.exe は日本語の Windows で CP932 として読む。UTF-8 で保存すると日本語の行で行境界がずれるので、文字コードは決めない（CP932 で保存する）
+charset = unset

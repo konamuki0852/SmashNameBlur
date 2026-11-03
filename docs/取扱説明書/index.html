@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>相手名マスク 使い方</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 図で使うモザイクの模様（見えない場所に一度だけ定義する） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="mz" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect class="mz1" width="4" height="4"/>
+      <rect class="mz2" x="4" width="4" height="4"/>
+      <rect class="mz3" y="4" width="4" height="4"/>
+      <rect class="mz4" x="4" y="4" width="4" height="4"/>
+    </pattern>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">本文へ</a>
+<div class="layout">
+
+<nav class="toc" aria-label="目次">
+  <div class="title">目次</div>
+  <ol>
+    <li><a href="#about">できること</a></li>
+    <li><a href="#need">必要なもの</a></li>
+    <li><a href="#first">はじめて使う（最初の一回）</a>
+      <ol>
+        <li><a href="#install">プラグインを入れる</a></li>
+        <li><a href="#add">フィルターを付ける</a></li>
+        <li><a href="#check">動いているか確かめる</a></li>
+      </ol>
+    </li>
+    <li><a href="#panel">設定の画面の見かた</a>
+      <ol>
+        <li><a href="#status-list">状態の一覧</a></li>
+      </ol>
+    </li>
+    <li><a href="#howto">〜するには</a>
+      <ol>
+        <li><a href="#howto-before">録画・配信の前に、動いているか確かめる</a></li>
+        <li><a href="#howto-verify">名前が隠れているか確かめる</a></li>
+        <li><a href="#howto-tagsize">頭上タグのモザイクの大きさと時間を変える</a></li>
+        <li><a href="#howto-audio">音声を別のソースで取り込んでいるときに、音を合わせる</a></li>
+        <li><a href="#howto-pause">一時的に止める・外す</a></li>
+        <li><a href="#howto-update">新しい版に入れ替える</a></li>
+        <li><a href="#howto-uninstall">アンインストールする</a></li>
+      </ol>
+    </li>
+    <li><a href="#faq">よくある質問</a></li>
+    <li><a href="#trouble">困ったとき</a>
+      <ol>
+        <li><a href="#t-notlisted">「相手名マスク」がフィルタの一覧に出てこない</a></li>
+        <li><a href="#t-cpu">CPU で行っています、と出る</a></li>
+        <li><a href="#t-late">映像に追いついていません、と出る</a></li>
+        <li><a href="#t-nodetect">頭上タグを検出できません、と出る</a></li>
+        <li><a href="#t-format">この映像の形式には対応していない、と出る</a></li>
+        <li><a href="#t-fixed">名前の無い場面でも、決まった位置にずっとモザイクが出る</a></li>
+        <li><a href="#t-audio">映像と音がずれる</a></li>
+        <li><a href="#t-stutter">録画・配信がカクつく、コマが落ちる</a></li>
+        <li><a href="#t-seen">相手の名前が見えてしまった</a></li>
+        <li><a href="#t-log">OBS のログを見るには</a></li>
+      </ol>
+    </li>
+    <li><a href="#spec">対応する環境と制限</a></li>
+  </ol>
+</nav>
+
+<main id="main">
+<header class="cover">
+  <h1>相手名マスク 使い方</h1>
+  <p>OBS Studio 用のフィルター　対象: 1.1.0</p>
+</header>
+
+
+<div class="note points">
+  <strong>まずはこの 3 つ</strong>
+  <ol>
+    <li>フィルターは、フィルタの画面の<strong>上の「音声/映像フィルタ」の＋</strong>から付けます（下の「エフェクトフィルタ」には出てきません）。</li>
+    <li>録画・配信の前に、相手名マスクの設定の画面を開き、いちばん上に黄色や赤の文（<a href="#status-list">状態</a>）が出ていないことを見ます。ふつうに動いているときは何も出ません。</li>
+    <li>名前の位置を先に調べるため、ゲームの映像は<strong>約 0.13 秒</strong>遅れます。同じソースの音声は OBS が自動で合わせます。</li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="about">1. できること</h2>
+<p>
+  「大乱闘スマッシュブラザーズ SPECIAL」（以下、スマブラSP）のオンライン対戦を OBS で録画・配信するとき、
+  <strong>相手のプレイヤー名が映る場所だけ</strong>を自動でモザイクにします。
+  キャプチャボードの映像にフィルターを 1 つ足すだけで、録画にも配信にも効きます。場面ごとの切り替えや位置合わせは要りません。
+</p>
+
+<figure>
+  <div class="scenes">
+    <figure class="scene">
+      <svg viewBox="0 0 320 180" role="img" aria-label="VS 画面の見取り図。右上にある相手の名札を隠す。左のあなたの名札は隠さない。">
+        <rect class="f-p1" x="1" y="1" width="159" height="178"/>
+        <rect class="f-p2" x="160" y="1" width="159" height="178"/>
+        <circle class="f-c1" cx="78" cy="122" r="36"/>
+        <circle class="f-c2" cx="242" cy="122" r="36"/>
+        <text class="f-big" x="160" y="134" text-anchor="middle">VS</text>
+        <text class="f-tm" x="50" y="14" text-anchor="middle">キャラ名</text>
+        <text class="f-tm" x="196" y="14" text-anchor="middle">キャラ名</text>
+        <rect class="f-plate" x="10" y="19" width="80" height="19" rx="2"/>
+        <text class="f-t" x="50" y="33" text-anchor="middle">1P あなた</text>
+        <rect class="f-mz" x="160" y="19" width="69" height="19"/>
+        <text class="f-lab" x="196" y="60" text-anchor="middle">相手の名札</text>
+        <rect class="f-scr" x="0.5" y="0.5" width="319" height="179" rx="6" style="fill:none"/>
+      </svg>
+      <figcaption>VS 画面</figcaption>
+    </figure>
+    <figure class="scene">
+      <svg viewBox="0 0 320 180" role="img" aria-label="バトルの見取り図。相手のキャラの頭上の名前（頭上タグ）と、画面下の HUD の相手の名前を隠す。">
+        <rect class="f-scr" x="0.5" y="0.5" width="319" height="179" rx="6"/>
+        <rect class="f-stage" x="50" y="118" width="220" height="8" rx="2"/>
+        <circle class="f-s1" cx="110" cy="107" r="10"/>
+        <circle class="f-s2" cx="206" cy="107" r="10"/>
+        <rect class="f-plate" x="92" y="78" width="36" height="13" rx="2"/>
+        <text class="f-tm" x="110" y="89" text-anchor="middle">1P</text>
+        <polygon class="f-s1" points="106,91 114,91 110,96"/>
+        <rect class="f-mz" x="178.5" y="77" width="55" height="16"/>
+        <polygon class="f-s2" points="202,94 210,94 206,99"/>
+        <text class="f-lab" x="206" y="68" text-anchor="middle">相手の頭上タグ</text>
+        <circle class="f-s1" cx="74" cy="159" r="8"/>
+        <text class="f-t" x="86" y="164">0%</text>
+        <rect class="f-plate" x="68" y="169" width="44" height="7" rx="1"/>
+        <circle class="f-s2" cx="196" cy="156" r="8"/>
+        <text class="f-t" x="208" y="161">0%</text>
+        <rect class="f-mz" x="205" y="164" width="80" height="15.5"/>
+        <text class="f-lab" x="242" y="146" text-anchor="middle">相手の HUD の名前</text>
+      </svg>
+      <figcaption>バトル</figcaption>
+    </figure>
+    <figure class="scene">
+      <svg viewBox="0 0 320 180" role="img" aria-label="リザルトの見取り図。右の相手のカードの名前を隠す。世界戦闘力は隠さない。カードが下側に止まっている間も、上へ動く間も名前を追いかけて隠す。">
+        <rect class="f-scr" x="0.5" y="0.5" width="319" height="179" rx="6"/>
+        <rect class="f-p1" x="42" y="26" width="88" height="140" rx="3"/>
+        <rect class="f-p2" x="190" y="26" width="88" height="140" rx="3"/>
+        <text class="f-t" x="86" y="45" text-anchor="middle">1P あなた</text>
+        <rect class="f-mz" x="192" y="32" width="58" height="18"/>
+        <text class="f-lab" x="221" y="66" text-anchor="middle">相手の名前</text>
+        <text class="f-t" x="234" y="88" text-anchor="middle">世界戦闘力は</text>
+        <text class="f-t" x="234" y="104" text-anchor="middle">隠さない</text>
+        <rect class="f-mz" x="188.5" y="138" width="91" height="22"/>
+        <text class="f-lab" x="234" y="132" text-anchor="middle">動いても追う</text>
+      </svg>
+      <figcaption>リザルト</figcaption>
+    </figure>
+  </div>
+  <div class="legend"><span><span class="swatch"></span>隠す所（モザイク）</span><span>見取り図です。実際の画面とは細部が違います。</span></div>
+  <figcaption>図 1　相手の名前を隠す 4 か所</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th scope="col">場面</th><th scope="col">隠す所</th><th scope="col">隠している間</th></tr></thead>
+  <tbody>
+    <tr><td class="nowrap">VS 画面</td><td>相手の名札（アイコンと名前）</td><td>VS 画面が出ている間ずっと</td></tr>
+    <tr><td class="nowrap">バトル</td><td>画面下の HUD の相手の名前</td><td>バトルの間ずっと（試合の終わりの演出で名前が動いても隠れるよう、少し広めに隠します）</td></tr>
+    <tr><td class="nowrap">バトル</td><td>相手のキャラの頭上に出る名前（この説明書では<strong>頭上タグ</strong>と呼びます）</td><td>映っている間。キャラと一緒に動いても追いかけて隠します</td></tr>
+    <tr><td class="nowrap">リザルト</td><td>相手のカードの名前（世界戦闘力は隠しません）</td><td>リザルトが出ている間ずっと。カードが上から入ってきて下側に止まり、上へ動いて結果の詳細になる間も、名前を追いかけて隠します</td></tr>
+  </tbody>
+</table>
+</div>
+
+<ul>
+  <li><strong>あなた（1P）の名前は隠しません。</strong>キャラ名やダメージの % もそのまま見えます。</li>
+  <li><strong>映像も名前も外に送りません。</strong>インターネットを使わず、名前や画像をファイルにもログにも残しません。</li>
+  <li>見逃し（名前が見えてしまうこと）を出さないことを優先しています。そのため、名前の近くや画面が切り替わる前後に、少し余計にモザイクがかかることがあります。</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="need">2. 必要なもの</h2>
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th scope="row">パソコン</th><td>Windows 10（1903 以降）／11（64 ビット）</td></tr>
+    <tr><th scope="row">OBS</th><td>OBS Studio 31.0.1 以降の 31 系（32 系以降では動作を確かめていません）</td></tr>
+    <tr><th scope="row">GPU</th><td>DirectX 12 に対応した GPU（おすすめ）。無くても CPU で動きますが、パソコンによっては 60fps で処理が追いつかないことがあります</td></tr>
+    <tr><th scope="row">映像の取り込み</th><td>キャプチャボードの映像を、OBS の<span class="ui">「映像キャプチャデバイス」</span>で 1920×1080（16:9）のまま取り込んでいること（60fps／30fps）</td></tr>
+    <tr><th scope="row">ゲーム</th><td>スマブラSP。ゲームの表示言語は日本語</td></tr>
+    <tr><th scope="row">対戦</th><td>オンラインの 1 対 1。あなたが 1P（左・赤）、相手が 2P（右・青）で表示されること</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="first">3. はじめて使う（最初の一回）</h2>
+<p>プラグインを入れて、キャプチャの映像にフィルターを付け、1 試合録画して名前が隠れているのを確かめるまでの流れです。</p>
+
+<h3 id="install">3.1 プラグインを入れる</h3>
+<ol class="steps">
+  <li>OBS を閉じる。</li>
+  <li>エクスプローラーのアドレス欄に <code>%ProgramData%\obs-studio\plugins</code> と入力して開く。
+    <span class="result">フォルダが無いと出たら、アドレス欄に <code>%ProgramData%</code> と入力して開き、<code>obs-studio</code> フォルダ（無ければ作る）の中に <code>plugins</code> フォルダを作ります。OBS を入れただけの PC では、どちらのフォルダも無いのがふつうです（<code>ProgramData</code> は隠しフォルダなので、アドレス欄に入力するのが確実です）。</span></li>
+  <li>配布物の <code>blur-name</code> フォルダを、フォルダごと <code>plugins</code> の中に置く。
+    <span class="result"><code>plugins\blur-name\bin\64bit\blur-name.dll</code> がある形になれば正しい置き方です。管理者の確認が出たら許可してください。</span></li>
+</ol>
+
+<h3 id="add">3.2 フィルターを付ける</h3>
+<ol class="steps" style="counter-reset: step 3">
+  <li>OBS を起動する。</li>
+  <li><span class="ui">「ソース」</span>の一覧で、キャプチャボードの映像キャプチャデバイスを右クリックし、<span class="ui">「フィルタ」</span>を選ぶ。
+    <span class="result">「'（ソースの名前）' のフィルタ」という画面が開きます（図 2）。</span></li>
+  <li>左上の<span class="ui">「音声/映像フィルタ」</span>の下にある<span class="ui">「＋」</span>を押し、<span class="ui">「相手名マスク」</span>を選ぶ<span class="mark inline" aria-hidden="true">1</span>。</li>
+  <li><span class="ui">「フィルタの名前を指定してください」</span>と出たら、名前はそのままで<span class="ui">「OK」</span>を押す。
+    <span class="result">一覧に「相手名マスク」が入り、右側に設定が出ます。</span></li>
+</ol>
+
+<div class="note warn">
+  <strong>下の「エフェクトフィルタ」には出てきません</strong>
+  このフィルターは、映像の時間を少し遅らせて処理する種類のため、OBS の決まりで<strong>上の「音声/映像フィルタ」の＋にだけ</strong>出ます。
+  また、<span class="ui">「ゲームキャプチャ」</span>・<span class="ui">「ウィンドウキャプチャ」</span>・<span class="ui">「画面キャプチャ」</span>には付けられません。映像キャプチャデバイスに付けてください。
+</div>
+
+<figure>
+  <div class="mock" role="img" aria-label="OBS のフィルタの画面の見取り図。左上の音声/映像フィルタの一覧に相手名マスクがあり、その下の＋に印 1。左下のエフェクトフィルタの＋には出ない。右側の上に遅延時間（印 2）があり、その下にパラメータのpx単位の説明、モザイクの強さ（弱い・普通・強いの選択と、既定値に戻すのボタン）、試合前対戦カード画面、試合中キャラ頭上（隠す範囲の横幅・高さ・隠し始める時間・隠し続ける時間のスライダーと、既定値に戻すのボタン）がある。その下に HUD とリザルトのグループが続く。下に既定値と閉じるのボタン。">
+    <div class="mock-title">'映像キャプチャデバイス' のフィルタ</div>
+    <div class="mock-body">
+      <div class="mock-left">
+        <div class="mock-label">音声/映像フィルタ</div>
+        <div class="mock-list">
+          <div class="mock-item sel">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8s2.6-4.6 7-4.6S15 8 15 8s-2.6 4.6-7 4.6S1 8 1 8z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
+            相手名マスク
+          </div>
+        </div>
+        <div class="mock-btns"><span class="mbtn hl">＋</span><span class="mbtn">−</span><span class="mark">1</span><span class="callout ok">ここの＋</span></div>
+        <div class="mock-label">エフェクトフィルタ</div>
+        <div class="mock-list"></div>
+        <div class="mock-btns"><span class="mbtn">＋</span><span class="mbtn">−</span><span class="callout ng">ここには出ない</span></div>
+      </div>
+      <div class="mock-right">
+        <div class="prop"><span class="k">遅延時間</span><span>約133ミリ秒(60fps)<span class="mark">2</span></span></div>
+        <div class="prop"><span class="k">パラメータのpx単位</span><span>1080p基準。720pの場合ズレがあります。</span></div>
+        <div class="pgroup">モザイクの強さ</div>
+        <div class="prop"><span class="k">強さ</span><span>○ 弱い　● 普通　○ 強い</span></div>
+        <div class="prop"><span class="k"></span><span><span class="pbtn">既定値に戻す</span></span></div>
+        <div class="pgroup">試合前対戦カード画面（左端[px]・上端[px]・横幅[px]・高さ[px]）</div>
+        <div class="pgroup">試合中キャラ頭上</div>
+        <div class="prop"><span class="k">隠す範囲の横幅[px]</span><span class="pslider"><span class="track"><span class="knob" style="left: 27%"></span></span>160</span></div>
+        <div class="prop"><span class="k">隠す範囲の高さ[px]</span><span class="pslider"><span class="track"><span class="knob" style="left: 24%"></span></span>48</span></div>
+        <div class="prop"><span class="k">隠し始める時間[ms]</span><span class="pslider"><span class="track"><span class="knob" style="left: 32%"></span></span>32</span></div>
+        <div class="prop"><span class="k">隠し続ける時間[ms]</span><span class="pslider"><span class="track"><span class="knob" style="left: 3%"></span></span>32</span></div>
+        <div class="prop"><span class="k"></span><span><span class="pbtn">既定値に戻す</span></span></div>
+      </div>
+    </div>
+    <div class="mock-foot"><span class="pbtn">既定値</span><span class="pbtn">閉じる</span></div>
+  </div>
+  <figcaption>図 2　フィルタの画面（見取り図。OBS の実際の画面とは細部が違います）</figcaption>
+</figure>
+
+<h3 id="check">3.3 動いているか確かめる</h3>
+<ol class="steps" style="counter-reset: step 7">
+  <li>右側のいちばん上に、黄色や赤の文が出ていないことを確かめる。
+    <span class="result">ふつうに動いているときは、いちばん上が<span class="ui">「遅延時間」</span>です。黄色や赤の文が出たら<a href="#status-list">状態の一覧</a>を見てください。フィルターを付けた直後は 10 秒ほど待ってから、フィルタの画面を開き直して確かめます。</span></li>
+  <li><span class="ui">「遅延時間」</span>に「約133ミリ秒(60fps)」のように出ていることを確かめる<span class="mark inline" aria-hidden="true">2</span>。
+    <span class="result">名前の位置を先に調べるために映像を遅らせている時間です。30fps なら約167ミリ秒です。映像と音声を同じソース（映像キャプチャデバイス）で取り込んでいれば、何もしなくてかまいません。</span></li>
+  <li><span class="ui">「閉じる」</span>を押す。</li>
+  <li>録画を始めて、オンライン対戦を 1 試合する。</li>
+  <li>録画を止めて再生し、VS 画面・バトル・リザルトで相手の名前が読めないことを確かめる。
+    <span class="result"><strong>これで準備は完了です。</strong>次からは何もしなくても、録画・配信で相手の名前が隠れます（OBS を起動し直しても、フィルターは付いたままです）。</span></li>
+</ol>
+
+<div class="note tip">
+  <strong>音声を別のソースで取り込んでいる人は</strong>
+  ゲームの音を映像キャプチャデバイス以外（<span class="ui">「デスクトップ音声」</span>や<span class="ui">「音声入力キャプチャ」</span>）で取り込んでいると、映像だけが遅れて音がずれます。<a href="#howto-audio">音声を別のソースで取り込んでいるときに、音を合わせる</a>の手順で合わせてください。
+</div>
+
+<!-- ============================================================ -->
+<h2 id="panel">4. 設定の画面の見かた</h2>
+<p>
+  設定の画面は、フィルタの画面で<span class="ui">「相手名マスク」</span>を選ぶと右側に出ます（図 2）。何も変えずに、付けたままで使えます。頭上タグのモザイクが大きすぎる・長すぎると感じたときだけ、<span class="ui">「試合中キャラ頭上」</span>を変えます。
+</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th scope="col">項目</th><th scope="col">内容</th></tr></thead>
+  <tbody>
+    <tr><td><span class="ui">状態</span></td><td>うまく動いていないときだけ、いちばん上に黄色（注意）か赤（エラー）の文で出ます。ふつうに動いているときは出ません。設定の画面を開いたときの様子を示すので、確かめ直すときは画面を開き直します。文の意味は<a href="#status-list">状態の一覧</a>を見てください</td></tr>
+    <tr><td><span class="ui">遅延時間</span></td><td>映像を遅らせている時間です（60fps で約133ミリ秒、30fps で約167ミリ秒）。音声を別のソースで取り込んでいるときだけ、この値を使って音を合わせます（<a href="#howto-audio">音声を別のソースで取り込んでいるときに、音を合わせる</a>）</td></tr>
+    <tr><td><span class="ui">パラメータのpx単位</span></td><td>「1080p基準。720pの場合ズレがあります。」と出ます。px の値は、1920×1080 の映像での画素数として決めています。1280×720 で取り込んでいると、実際の画素数は値の 3 分の 2 になります（横幅 300 なら 200 画素）。ゲームの画面は解像度によらず同じ配置なので、どの解像度でも同じ値で同じ割合を隠せます</td></tr>
+    <tr><td><span class="ui">モザイクの強さ</span></td><td>モザイクの粗さを<span class="ui">「弱い」</span><span class="ui">「普通」</span><span class="ui">「強い」</span>から選びます（既定は普通）。強いほど名前が読みにくくなり、弱いほど周りが見えます。弱いでは、名前の字の形がうっすら分かることがあります。隠す範囲（頭上タグ・VS 画面・HUD・リザルト）すべてに効きます</td></tr>
+    <tr><td><span class="ui">試合前対戦カード画面</span>・<span class="ui">試合中HUD</span>・<span class="ui">リザルト画面</span></td><td>決まった場所に出る名前を隠す範囲です。それぞれ<span class="ui">「左端」</span><span class="ui">「上端」</span><span class="ui">「横幅」</span><span class="ui">「高さ」</span>を、1920×1080 の映像に換算した画素数で指定します（左上が 0）。ゲームの表示がずれたときや、隠しすぎると感じたときに使います。各グループの下の<span class="ui">「既定値に戻す」</span>で戻せます。横幅か高さを 0 にすると、その場所は隠しません。リザルトで隠すのは名前だけで、世界戦闘力は隠しません。リザルトで動く相手のカードの名前は、この範囲とは別に追いかけて隠します</td></tr>
+    <tr><td><span class="ui">隠す範囲の横幅[px]</span></td><td>頭上タグ（キャラの上の名前）を隠すモザイクの横幅です。単位は<span class="ui">「パラメータのpx単位」</span>のとおり 1920×1080 での px で、0〜600（既定 160）。0 にすると頭上タグは隠しません</td></tr>
+    <tr><td><span class="ui">隠す範囲の高さ[px]</span></td><td>頭上タグを隠すモザイクの高さです。単位は横幅と同じで、0〜200（既定 48）。0 にすると頭上タグは隠しません</td></tr>
+    <tr><td><span class="ui">隠し始める時間[ms]</span></td><td>頭上タグを検出したコマより前から、モザイクをかけ始める時間です。0〜100（既定 32）。短くするとタグの出始めで名前が見えやすくなります。遅延時間は変わりません</td></tr>
+    <tr><td><span class="ui">隠し続ける時間[ms]</span></td><td>頭上タグを検出できなくなってから、モザイクを残しておく時間です。0〜1000（1000 ms が 1 秒。既定 32）</td></tr>
+    <tr><td><span class="ui">既定値に戻す</span></td><td>各グループの下にあり、そのグループの値だけを既定に戻します。ほかのグループは変わりません。画面のいちばん下の<span class="ui">「既定値」</span>は、すべての項目を戻します</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>スライダーは、マウスを重ねると説明と既定値が出ます。既定から変えても注意は出ません。小さく・短くするほど名前が一瞬見えやすくなるので、変えたら録画して確かめてください（<a href="#howto-tagsize">頭上タグのモザイクの大きさと時間を変える</a>）。</p>
+
+<h3 id="status-list">4.1 状態の一覧</h3>
+<p>設定の画面のいちばん上に出る文です。ふつうに動いているときは何も出ません。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th scope="col">表示される文</th><th scope="col">色</th><th scope="col">名前の隠し</th><th scope="col">すること</th></tr></thead>
+  <tbody>
+    <tr><td><span class="msg warn">頭上タグの検出を CPU で行っています（GPU を使えませんでした）。…</span></td><td><span class="badge warn">注意</span></td><td>すべて隠す。60fps では追いつかないことがある</td><td><a href="#t-cpu">困ったとき</a></td></tr>
+    <tr><td><span class="msg warn">頭上タグの検出が映像に追いついていません（直近 1 分に ◯ 回）。そのあいだは頭上タグのまわりを広めに隠しています。…</span></td><td><span class="badge warn">注意</span></td><td>すべて隠す（いつもより広めに隠す）</td><td><a href="#t-late">困ったとき</a></td></tr>
+    <tr><td><span class="msg err">頭上タグを検出できません（◯◯）。VS 画面・HUD・リザルトの名前だけを隠しています。…</span></td><td><span class="badge err">エラー</span></td><td><strong>頭上タグは隠せない</strong>。VS 画面・HUD・リザルトだけ隠す</td><td><a href="#t-nodetect">困ったとき</a></td></tr>
+    <tr><td><span class="msg err">この映像の形式（◯◯）には対応していないため、名前を隠せません。…</span></td><td><span class="badge err">エラー</span></td><td><strong>どこも隠せない</strong></td><td><a href="#t-format">困ったとき</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="howto">5. 〜するには</h2>
+
+<h3 id="howto-before">5.1 録画・配信の前に、動いているか確かめる</h3>
+<p>OBS や Windows・GPU のドライバーを更新した後や、大事な配信の前に確かめます。</p>
+<ol class="steps">
+  <li>映像キャプチャデバイスを右クリックし、<span class="ui">「フィルタ」</span>を選ぶ。</li>
+  <li><span class="ui">「音声/映像フィルタ」</span>の一覧で<span class="ui">「相手名マスク」</span>を選ぶ。</li>
+  <li>右側のいちばん上に黄色や赤の文が出ていなければ、そのまま使えます。
+    <span class="result">ほかの文なら<a href="#status-list">状態の一覧</a>から、することを確かめます。</span></li>
+</ol>
+
+<h3 id="howto-verify">5.2 名前が隠れているか確かめる</h3>
+<ol class="steps">
+  <li>録画を始めて、オンライン対戦を 1 試合する。</li>
+  <li>録画を止めて再生する。</li>
+  <li>VS 画面の相手の名札、バトル中の画面下の HUD と相手のキャラの頭上、リザルトの相手のパネルで、名前が読めないことを確かめる。
+    <span class="result">名前が見えた所があったら、<a href="#t-seen">相手の名前が見えてしまった</a>を見てください。</span></li>
+</ol>
+
+<h3 id="howto-tagsize">5.3 頭上タグのモザイクの大きさと時間を変える</h3>
+<p>既定（横幅 160・高さ 48・隠し始める 32 ms・隠し続ける 32 ms）は、キャラがなるべく隠れないよう、名前のラベルにほぼ合わせた小さめの値です。タグの出始めや、キャラが速く動いたときに名前が一瞬見えることがあるので、気になるときは大きく・長くします。<strong>小さく・短くするほど、名前が一瞬見えやすくなります。</strong></p>
+<ol class="steps">
+  <li>実際に対戦しながら（またはトレーニングモードで）、フィルタの画面で<span class="ui">「相手名マスク」</span>を選ぶ。<span class="result">フィルタの画面のプレビューで、モザイクを見ながら変えられます。</span></li>
+  <li><span class="ui">「試合中キャラ頭上」</span>のスライダーを動かす。
+    <span class="result">次のコマから、プレビューのモザイクの大きさと残る長さが変わります。録画した動画で試すときは、再生しているあいだに変わります（一時停止中は、再生を再開するまで変わりません）。相手名マスクを付けて録画した動画は、モザイクが映像に残っているので試すのに使えません。</span></li>
+  <li>録画して見返し、キャラの上の名前が読めないことを確かめる。
+    <span class="result">名前が見えたら、値を大きく・長くします。グループの下の<span class="ui">「既定値に戻す」</span>を押すと、4 つとも既定に戻ります。</span></li>
+</ol>
+<p>値の目安です（開発者の 14 試合の録画で、頭上タグが映っていた 163 コマを確かめた結果）。「隠れる面積」は、バトル中にキャラの上がモザイクで隠れる量を、見逃しを出さない値（いちばん上の行）を 100% として比べたものです。隠し始める時間は、既定の行のほかは 100 ms です。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th scope="col">目安</th><th scope="col">横幅</th><th scope="col">高さ</th><th scope="col">隠し続ける時間</th><th scope="col">隠れる面積</th><th scope="col">名前が見えたコマ</th></tr></thead>
+  <tbody>
+    <tr><td>見逃しを出さない（1.1.0 より前の既定）</td><td>330 px</td><td>96 px</td><td>500 ms</td><td>100%</td><td>0</td></tr>
+    <tr><td>少し小さく</td><td>270 px</td><td>72 px</td><td>300 ms</td><td>55%</td><td>0</td></tr>
+    <tr><td>小さく（見やすさ重視のおすすめ）</td><td>240 px</td><td>72 px</td><td>200 ms</td><td>40%</td><td>0</td></tr>
+    <tr><td>かなり小さく（余裕なし）</td><td>180 px</td><td>72 px</td><td>100 ms</td><td>24%</td><td>0</td></tr>
+    <tr><td>高さを 56 px 以下にする</td><td>330 px</td><td>56 px</td><td>500 ms</td><td>78%</td><td><strong>1</strong></td></tr>
+    <tr><td>時間を 0 ms にする</td><td>330 px</td><td>96 px</td><td>0 ms</td><td>35%</td><td><strong>1</strong></td></tr>
+    <tr><td>ラベルとほぼ同じ大きさ</td><td>180 px</td><td>40 px</td><td>0 ms</td><td>11%</td><td><strong>4</strong></td></tr>
+    <tr><td>既定（隠し始める 32 ms）</td><td>160 px</td><td>48 px</td><td>32 ms</td><td>7%</td><td><strong>3</strong></td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li><strong>高さは 72 px より下げない、時間は 100 ms より短くしない</strong>のが目安です。高さを下げると、タグが上下に揺れたときに名前の端が出ます。時間を 0 にすると、薄いタグや消え際で見えます。</li>
+  <li>横幅は、180 px まで狭めても見えたコマはありませんでした。ただし、高さや時間も同時に縮めると見えやすくなります（180 px・64 px・200 ms では 1 コマ見えました）。</li>
+  <li>横幅か高さを 0 にすると、頭上タグはまったく隠しません（隠したときと見比べる用です）。名前のラベルは横 約 186 px・高さ 約 42 px なので、これより小さいと名前がはみ出します。</li>
+  <li>試合やキャラによって違うので、変えたら一度録画して確かめてください。</li>
+</ul>
+
+<h3 id="howto-audio">5.4 音声を別のソースで取り込んでいるときに、音を合わせる</h3>
+<p>
+  ゲームの音を、映像キャプチャデバイスとは別のソースで取り込んでいるときだけ必要です。
+  映像キャプチャデバイスのプロパティの<span class="ui">「音声出力モード」</span>が<span class="ui">「音声のみをキャプチャ」</span>なら、音は同じソースに入っているので、OBS が自動で合わせます（この手順は要りません）。
+</p>
+<ol class="steps">
+  <li>相手名マスクの設定で、<span class="ui">「遅延時間」</span>の値を見る（例: 約133ミリ秒）。</li>
+  <li>OBS のメニュー<span class="ui">「編集」</span>→<span class="ui">「オーディオの詳細プロパティ」</span>を開く。</li>
+  <li>ゲームの音が入っているソース（<span class="ui">「デスクトップ音声」</span>や<span class="ui">「音声入力キャプチャ」</span>など）の行の<span class="ui">「同期オフセット」</span>に、その値（例: 133）を入れる。</li>
+  <li>短く録画して再生し、効果音と映像が合っていることを確かめる。</li>
+</ol>
+<div class="note tip">
+  <strong>fps を変えたら</strong>
+  遅延時間は fps で変わります（60fps で約133ミリ秒、30fps で約167ミリ秒）。OBS の<span class="ui">「設定」</span>→<span class="ui">「映像」</span>の<span class="ui">「FPS 共通値」</span>や、映像キャプチャデバイスの fps を変えたら、相手名マスクの<span class="ui">「遅延時間」</span>を見直し、同期オフセットも新しい値に入れ直してください。
+</div>
+
+<h3 id="howto-pause">5.5 一時的に止める・外す</h3>
+<ul>
+  <li><strong>一時的に止める</strong>: フィルタの画面の一覧で、<span class="ui">「相手名マスク」</span>の左の目のアイコンを押します。元の映像に戻り、<strong>名前は隠れなくなります</strong>。もう一度押すと元に戻ります。</li>
+  <li><strong>外す</strong>: 一覧で<span class="ui">「相手名マスク」</span>を選び、一覧の下の<span class="ui">「−」</span>を押します。</li>
+</ul>
+
+<h3 id="howto-update">5.6 新しい版に入れ替える</h3>
+<ol class="steps">
+  <li>OBS を閉じる。</li>
+  <li><code>%ProgramData%\obs-studio\plugins\blur-name</code> フォルダを消してから、新しい版の <code>blur-name</code> フォルダを置く。<span class="result">上書きで重ねると古いファイルが残ることがあるので、先に消します。</span></li>
+  <li>OBS を起動し、<a href="#howto-before">動いているか確かめる</a>。
+    <span class="result">フィルターは付いたまま残ります。付け直す必要はありません。</span></li>
+</ol>
+
+<h3 id="howto-uninstall">5.7 アンインストールする</h3>
+<ol class="steps">
+  <li>OBS を閉じる。</li>
+  <li><code>%ProgramData%\obs-studio\plugins\blur-name</code> フォルダを消す。</li>
+</ol>
+<p class="muted">OBS 本体には手を加えていないので、ほかに消すものはありません。</p>
+
+<!-- ============================================================ -->
+<h2 id="faq">6. よくある質問</h2>
+<dl class="faq">
+  <dt>映像が遅れるのはなぜですか？ どのくらい遅れますか？</dt>
+  <dd>名前の位置を、映像を出す前に少し先まで調べてから隠すためです。60fps で約 0.13 秒、30fps で約 0.17 秒遅れます。同じソースの音声は OBS が自動で同じだけ遅らせるので、録画・配信で映像と音はずれません。</dd>
+
+  <dt>実況の声やカメラとずれませんか？</dt>
+  <dd>遅れるのはゲームの映像（と同じソースの音声）だけです。0.13 秒ほどなので、ふつうは気になりません。気になる場合は、マイクの音は<a href="#howto-audio">同期オフセット</a>で、カメラの映像は OBS の<span class="ui">「映像の遅延 (非同期)」</span>フィルタの<span class="ui">「遅延時間」</span>で、同じだけ遅らせられます。</dd>
+
+  <dt>自分の名前も隠れますか？</dt>
+  <dd>いいえ。隠すのは相手（2P）の名前だけです。</dd>
+
+  <dt>録画と配信の両方に効きますか？</dt>
+  <dd>はい。フィルターはキャプチャのソースに付くので、そのソースを映すシーン・録画・配信のすべてに効きます。</dd>
+
+  <dt>名前の無い所にもモザイクがかかるのはなぜですか？</dt>
+  <dd>見逃しを出さないことを優先しているためです。頭上タグがありそうな所を少し広めに隠したり、画面が切り替わる前後にしばらく隠し続けたりします。バトル中は、試合の終わりの演出で名前が下へ動いても隠れるよう、画面下の相手の HUD のあたりを少し広めに隠しています。頭上タグのモザイクは<a href="#howto-tagsize">小さく・短くできます</a>。</dd>
+
+  <dt>映像や名前がどこかに送られたり、保存されたりしませんか？</dt>
+  <dd>しません。インターネットを使わず、名前や画像をファイルにもログにも残しません。設定は OBS のシーンと一緒に保存されますが、名前は入りません。</dd>
+
+  <dt>GPU が無くても使えますか？</dt>
+  <dd>使えます。GPU を使えないときは CPU で処理し、状態に<span class="msg warn">頭上タグの検出を CPU で行っています（GPU を使えませんでした）。</span>と出ます。パソコンによっては 60fps で追いつかないことがあります。</dd>
+
+  <dt>チーム戦・乱闘・専用部屋・オフラインの対戦でも使えますか？</dt>
+  <dd>1.1.0 では、オンラインの 1 対 1 だけが対象です。ほかの場面では名前の場所が違うため、隠れないことがあります。</dd>
+
+  <dt>モザイクの大きさや粗さ（強さ）を変えたり、隠している所を確かめる枠を出したりできますか？</dt>
+  <dd>頭上タグのモザイクの大きさと残る時間は、1.1.0 から変えられます（<a href="#howto-tagsize">頭上タグのモザイクの大きさと時間を変える</a>）。VS 画面・HUD・リザルトの範囲も、1.1.0 から位置と大きさを変えられます（<a href="#panel">設定の画面の見かた</a>）。モザイクの粗さも、1.1.0 から<span class="ui">「モザイクの強さ」</span>（弱い・普通・強い）で選べます。確かめる枠は、まだ出せません。</dd>
+</dl>
+
+<!-- ============================================================ -->
+<h2 id="trouble">7. 困ったとき</h2>
+<p>まず、フィルタの画面で相手名マスクを選び、設定の画面のいちばん上に出ている文を見てください（ふつうに動いているときは何も出ません）。表示される文ごとの対処は次のとおりです。</p>
+
+<h3 class="symptom" id="t-notlisted">「相手名マスク」がフィルタの一覧に出てこない</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>下の「エフェクトフィルタ」の＋を押している、付けられないソースを選んでいる、またはプラグインが読み込まれていません。</dd>
+  <dt>対処</dt>
+  <dd><ol>
+    <li>上の<span class="ui">「音声/映像フィルタ」</span>の<span class="ui">「＋」</span>を押しているか確かめる。</li>
+    <li>選んでいるソースが映像キャプチャデバイスか確かめる（ゲームキャプチャ・ウィンドウキャプチャ・画面キャプチャには付けられません）。</li>
+    <li><code>%ProgramData%\obs-studio\plugins\blur-name\bin\64bit\blur-name.dll</code> があるか確かめ、無ければ<a href="#install">入れ直す</a>。</li>
+    <li>OBS が 31.0.1 以降の 31 系か確かめる（<span class="ui">「ヘルプ」</span>→<span class="ui">「OBS Studioについて」</span>で見られます）。32 系以降では動作を確かめていないため、読み込めないことがあります。</li>
+  </ol></dd>
+</dl>
+
+<h3 class="symptom" id="t-cpu">「頭上タグの検出を CPU で行っています（GPU を使えませんでした）。」と出る</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>GPU で処理できなかったので、CPU で処理しています。名前は隠れていますが、60fps では追いつかないことがあります。</dd>
+  <dt>対処</dt>
+  <dd><ol>
+    <li>GPU のドライバーを更新する。</li>
+    <li>OBS を起動し直し、相手名マスクの設定の画面を開いて、文が消えたか確かめる。</li>
+    <li>直らないときは、OBS の<span class="ui">「設定」</span>→<span class="ui">「映像」</span>の<span class="ui">「FPS 共通値」</span>を 30 にすると追いつきやすくなります（録画・配信の出力の設定ではなく、映像の設定です）。</li>
+  </ol></dd>
+</dl>
+
+<h3 class="symptom" id="t-late">「頭上タグの検出が映像に追いついていません（直近 1 分に ◯ 回）。…」と出る</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>パソコンの負荷が高く、名前を調べるのが間に合っていません。そのあいだは、いつもより広めに隠して見逃しを防いでいます。</dd>
+  <dt>対処</dt>
+  <dd><ol>
+    <li>ほかのアプリ（ブラウザの動画・ゲームなど）を閉じる。</li>
+    <li>OBS の負荷の高い設定（高い画質のエンコード・重いフィルター）を見直す。</li>
+    <li>OBS の<span class="ui">「設定」</span>→<span class="ui">「映像」</span>の<span class="ui">「FPS 共通値」</span>を 30 にする。</li>
+  </ol></dd>
+</dl>
+
+<h3 class="symptom" id="t-nodetect">「頭上タグを検出できません（◯◯）。VS 画面・HUD・リザルトの名前だけを隠しています。」と出る</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>頭上タグを調べる部品を使えません。（　）の中に理由が出ます。<strong>この状態では頭上タグが隠れない</strong>ので、そのまま録画・配信しないでください。</dd>
+  <dt>対処</dt>
+  <dd><ul>
+    <li>「推論ライブラリが見つからない」「推論ライブラリの版が合わない」「モデルが見つからない」「モデルの形式が合わない」のとき: プラグインのフォルダが欠けているか、古い版が混ざっています。OBS を閉じて、<a href="#howto-update">フォルダを丸ごと置き換え</a>てください。</li>
+    <li>「推論に失敗」のとき: OBS を起動し直してください。GPU のドライバーの更新も試してください。</li>
+    <li>直らないときは、<a href="#t-log">OBS のログ</a>の本プラグインの行を添えて、<a href="#t-contact">開発者に知らせて</a>ください。</li>
+  </ul></dd>
+</dl>
+
+<h3 class="symptom" id="t-format">「この映像の形式（◯◯）には対応していないため、名前を隠せません。」と出る</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>キャプチャボードから届く映像の形式に対応していません。<strong>この状態ではどこも隠れません。</strong></dd>
+  <dt>対処</dt>
+  <dd><ol>
+    <li>映像キャプチャデバイスを右クリックし、<span class="ui">「プロパティ」</span>を開く。</li>
+    <li><span class="ui">「解像度/FPS タイプ」</span>を<span class="ui">「カスタム」</span>にする。</li>
+    <li><span class="ui">「映像フォーマット」</span>を<span class="ui">「NV12」</span>にする（無ければ<span class="ui">「YUY2」</span>）。解像度は 1920×1080 にする。</li>
+    <li><span class="ui">「OK」</span>を押し、相手名マスクの設定の画面を開き直して、文が消えたか確かめる。</li>
+  </ol></dd>
+</dl>
+
+<h3 class="symptom" id="t-fixed">名前の無い場面でも、決まった位置にずっとモザイクが出る</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>VS 画面・バトル・リザルトを見分ける部品を読み込めず、見逃しを防ぐため、VS 画面の名札・HUD・リザルトの位置をいつも隠しています。「状態」は動作中のままですが、<a href="#t-log">OBS のログ</a>に <code>screen model unavailable</code> と出ます。</dd>
+  <dt>対処</dt>
+  <dd>OBS を閉じて、<a href="#howto-update">プラグインのフォルダを入れ替え</a>てください（フォルダが欠けているか、古い版が混ざっています）。</dd>
+</dl>
+
+<h3 class="symptom" id="t-audio">映像と音がずれる</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>ゲームの音を映像キャプチャデバイスとは別のソースで取り込んでいて、映像だけが遅れています。fps を変えた後なら、遅れの値が変わっています。</dd>
+  <dt>対処</dt>
+  <dd><a href="#howto-audio">音声を別のソースで取り込んでいるときに、音を合わせる</a>の手順で、同期オフセットを遅延時間と同じ値にしてください。</dd>
+</dl>
+
+<h3 class="symptom" id="t-stutter">録画・配信がカクつく、コマが落ちる</h3>
+<dl class="fix">
+  <dt>原因</dt>
+  <dd>パソコンの負荷が高くなっています。</dd>
+  <dt>対処</dt>
+  <dd><ol>
+    <li>OBS のメニュー<span class="ui">「ドック」</span>→<span class="ui">「統計」</span>を開き、<span class="ui">「レンダリングラグにより逃したフレーム」</span>と<span class="ui">「エンコードラグによりスキップされたフレーム」</span>が増えていないか見る。</li>
+    <li>増えているときは、相手名マスクの目のアイコンで一時的に止めて比べる。止めると増えなくなるなら、<a href="#t-late">追いついていないとき</a>と同じ対処をする。</li>
+  </ol></dd>
+</dl>
+
+<h3 class="symptom" id="t-seen">相手の名前が見えてしまった</h3>
+<dl class="fix">
+  <dt>まず</dt>
+  <dd>その録画は、投稿する前に動画編集ソフトで名前の所を隠してください。</dd>
+  <dt>確かめる</dt>
+  <dd><ol>
+    <li>設定の画面のいちばん上に<a href="#status-list">状態</a>の文が出ていないか確かめる。出ていれば、その対処をする。</li>
+    <li>オンラインの 1 対 1 で、あなたが 1P・相手が 2P だったか確かめる（ほかの場面は対象外です）。</li>
+    <li>見えたのが頭上タグなら、<span class="ui">「試合中キャラ頭上」</span>を確かめる。名前が見えたら、大きく・長くするか<span class="ui">「既定値に戻す」</span>で戻す。</li>
+    <li>上のどれにも当てはまらないときは、録画の時刻と、どの場面（VS 画面・HUD・頭上タグ・リザルト）だったかを控えて、<a href="#t-contact">開発者に知らせて</a>ください。<strong>名前が写った画像は送らないでください。</strong></li>
+  </ol></dd>
+</dl>
+
+<h3 id="t-log">OBS のログを見るには</h3>
+<ol class="steps">
+  <li>OBS のメニュー<span class="ui">「ヘルプ」</span>→<span class="ui">「ログファイル」</span>→<span class="ui">「現在のログを表示」</span>を選ぶ。</li>
+  <li><kbd>Ctrl</kbd>＋<kbd>F</kbd> で <code>blur-name</code> を探す。
+    <span class="result">本プラグインの行には、時刻の後に <code>[blur-name]</code> が付きます。GPU で動いていれば <code>provider=DML</code>、CPU なら <code>provider=CPU</code> のように出ます。</span></li>
+</ol>
+<p class="muted">本プラグインの行には、相手の名前や画像は書かれません。</p>
+
+<h3 id="t-contact">それでも解決しないとき</h3>
+<p>次をまとめて開発者に知らせてください。</p>
+<ul>
+  <li>相手名マスクの版（1.1.0）と、OBS の版</li>
+  <li><span class="ui">「状態」</span>に出ていた文</li>
+  <li>OBS のログの <code>[blur-name]</code> の行</li>
+  <li>いつ・どの場面で起きたか（名前が写った画像は付けないでください）</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="spec">8. 対応する環境と制限</h2>
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th scope="row">対応する環境</th><td>Windows 10（1903 以降）／11（64 ビット）、OBS Studio 31.0.1 以降の 31 系（32 系以降は未確認）。GPU は DirectX 12 対応のもの（おすすめ）</td></tr>
+    <tr><th scope="row">映像</th><td>映像キャプチャデバイスで取り込んだ 1920×1080（16:9）、60fps／30fps の映像</td></tr>
+    <tr><th scope="row">遅延時間</th><td>60fps で約133ミリ秒、30fps で約167ミリ秒</td></tr>
+    <tr><th scope="row">対象の対戦</th><td>スマブラSP のオンラインの 1 対 1（表示言語は日本語。あなたが 1P、相手が 2P）</td></tr>
+    <tr><th scope="row">隠さないもの</th><td>あなた（1P）の名前。専用部屋（名簿・観戦）・チーム戦・3〜4 人の乱闘・オフラインの対戦・リプレイの名前</td></tr>
+    <tr><th scope="row">通信・保存</th><td>インターネットを使いません。名前や画像をファイルにもログにも残しません</td></tr>
+    <tr><th scope="row">注意</th><td>16:9 でない映像や、ゲームの更新で名前の場所・見た目が変わったときは、隠れないことがあります</td></tr>
+    <tr><th scope="row">余計なモザイク</th><td>キャラ選択の後の待ち画面（READY TO FIGHT）など、バトルに似た画面の右下に、HUD の位置のモザイクがかかることがあります（名前の無い所なので、見逃しにはなりません）</td></tr>
+    <tr><th scope="row">ライセンス</th><td>GPL-2.0 以降（全文は配布物の <code>blur-name\LICENSE.txt</code>）。同梱の ONNX Runtime は MIT（<code>licenses\onnxruntime</code> に利用条件があります）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<footer>
+  <p>相手名マスク 1.1.0 の使い方（作者: Konamuki）。不具合の報告・要望は <a href="https://github.com/konamuki0852/SmashNameBlur/issues">GitHub の Issues</a> へ。相手の名前が写った画像や動画は貼らないでください。</p>
+  <p>「大乱闘スマッシュブラザーズ SPECIAL」は任天堂の商標です。本プラグインは非公式のファンツールで、任天堂・ソラ・バンダイナムコスタジオとは関係ありません。</p>
+</footer>
+</main>
+</div>
+</body>
+</html>

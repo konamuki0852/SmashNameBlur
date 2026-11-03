@@ -1,0 +1,11 @@
+# 改行は LF に統一する（.editorconfig と合わせる）。Windows のバッチ・PowerShell だけは CRLF
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.onnx binary
+*.pt binary
+*.bin binary

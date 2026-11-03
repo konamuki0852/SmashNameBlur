@@ -1,0 +1,42 @@
+# ===== 学習データ・モデル（相手の名前が写る。絶対に入れない）=====
+/data/
+
+# ===== 開発でのみ使うファイル（公開しない。手元には残す）=====
+# エージェントへの指示・引き継ぎの記録
+/AGENTS.md
+/CLAUDE.md
+/TODO.md
+/CHANGELOG.md
+# 設計書・調査・テスト結果・企画
+/docs/設計書/
+/docs/調査/
+/docs/テスト結果/
+/docs/企画メモ.md
+# 開発用の道具（方式検証・システムテスト・OBS への入れ替え・ZIP 作成・検証用 CLI）
+/spike/
+/tools/
+/plugin/tools/
+# 学習・検証の Python
+/ml/
+
+# ===== OBS プラグイン（CMake）=====
+/plugin/.deps/
+/plugin/build_*/
+/plugin/release/
+/plugin/cmake/.CMakeBuildNumber
+*.lock.json
+.vs/
+*.user
+
+# ===== Python =====
+.venv/
+.venv-*/
+__pycache__/
+
+# ===== 共通 =====
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db

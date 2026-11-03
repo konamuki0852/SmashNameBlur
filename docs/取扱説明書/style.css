@@ -1,0 +1,316 @@
+/* 相手名マスク 使い方 — 見た目の決まり。色はすべて :root の変数で決め、暗い表示（ダークモード）でも読めるようにする */
+
+:root {
+  color-scheme: light dark;
+  --text: #1d2228;
+  --muted: #5b6570;
+  --line: #d7dce1;
+  --bg: #ffffff;
+  --panel: #f5f7f9;
+  --accent: #1e6fd9;
+  --ui: #0b4fa8;
+  --warn-bg: #fdecec;
+  --warn: #b42318;
+  --tip-bg: #eaf6ec;
+  --tip: #1f7a35;
+  --draft-bg: #fff6e0;
+  --draft: #8a5a00;
+  /* 状態の文の色（OBS の情報・注意・エラーに相当） */
+  --st-info: #1d2228;
+  --st-warn: #a15c00;
+  --st-err: #c62828;
+  /* 図（見取り図）の色 */
+  --scr: #e9edf1;
+  --scr-line: #b9c2cb;
+  --p1: #d9534f;
+  --p1-soft: #f7dcdb;
+  --p2: #2f6fd6;
+  --p2-soft: #d8e5f8;
+  --stage: #9aa5b1;
+  --mz-1: #66727f;
+  --mz-2: #8b96a2;
+  --mz-3: #aab3bd;
+  --mz-4: #78838f;
+  --hl: #e8590c;
+  /* OBS の画面の見取り図（OBS の既定の暗いテーマに寄せて固定） */
+  --mock-bg: #2b2e38;
+  --mock-head: #1c1e25;
+  --mock-panel: #1f2129;
+  --mock-text: #e4e6eb;
+  --mock-muted: #9aa0ab;
+  --mock-line: #41465a;
+  --mock-sel: #3b4b6b;
+  --mock-btn: #3a3f52;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e6e9ec;
+    --muted: #a3adb8;
+    --line: #343b43;
+    --bg: #15181c;
+    --panel: #1d2126;
+    --accent: #6aa7ff;
+    --ui: #8cc0ff;
+    --warn-bg: #3a1f1f;
+    --warn: #ff8a80;
+    --tip-bg: #17301f;
+    --tip: #7fd99a;
+    --draft-bg: #3a2e12;
+    --draft: #ffcf70;
+    --st-info: #e6e9ec;
+    --st-warn: #ffc857;
+    --st-err: #ff6b6b;
+    --scr: #262b31;
+    --scr-line: #48515b;
+    --p1: #ff6b66;
+    --p1-soft: #4a2524;
+    --p2: #6aa0ff;
+    --p2-soft: #1f3150;
+    --stage: #5d6772;
+    --hl: #ff922b;
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+/* 読み上げ・キーボードで本文へ飛ぶ */
+.skip {
+  position: absolute; left: -9999px; top: 0;
+  background: var(--accent); color: #fff; padding: 6px 12px; z-index: 10;
+}
+.skip:focus { left: 8px; top: 8px; }
+
+/* ---- 全体の配置（左に目次、右に本文） ---- */
+.layout { display: flex; align-items: flex-start; max-width: 1280px; margin: 0 auto; }
+nav.toc {
+  position: sticky; top: 0; flex: 0 0 260px; height: 100vh; overflow-y: auto;
+  padding: 24px 16px 40px 24px; border-right: 1px solid var(--line); background: var(--panel);
+  font-size: 14px; line-height: 1.6;
+}
+nav.toc .title { font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+nav.toc ol { margin: 0; padding-left: 20px; }
+nav.toc li { margin: 4px 0; }
+nav.toc a { color: var(--text); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent); text-decoration: underline; }
+nav.toc ol ol { font-size: 13px; color: var(--muted); list-style: none; padding-left: 12px; }
+main { flex: 1 1 auto; min-width: 0; padding: 32px 48px 80px; max-width: 1000px; }
+
+/* ---- 見出しと文 ---- */
+header.cover { border-bottom: 3px solid var(--text); padding-bottom: 16px; margin-bottom: 24px; }
+header.cover h1 { font-size: 30px; margin: 0 0 4px; line-height: 1.3; }
+header.cover p { margin: 0; color: var(--muted); }
+h2 {
+  font-size: 24px; margin: 56px 0 16px; padding: 4px 0 4px 14px;
+  border-left: 6px solid var(--accent); line-height: 1.4;
+}
+h3 { font-size: 19px; margin: 36px 0 10px; line-height: 1.4; }
+h3.symptom { font-size: 17px; padding: 8px 12px; background: var(--panel); border-radius: 6px; }
+p { margin: 8px 0 12px; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+ul, ol { padding-left: 1.6em; }
+li { margin: 4px 0; }
+.muted { color: var(--muted); }
+
+/* 画面の名前・ボタンの名前（実物の文言） */
+.ui { font-weight: 700; color: var(--ui); }
+/* 本フィルターの状態の文（設定の画面に出る文） */
+.msg {
+  display: inline; padding: 1px 6px; border: 1px solid var(--line); border-radius: 4px;
+  background: var(--panel); color: var(--st-info); font-weight: 600;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.msg.warn { color: var(--st-warn); }
+.msg.err { color: var(--st-err); }
+code {
+  font-family: Consolas, "BIZ UDGothic", "MS Gothic", monospace; font-size: 0.92em;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px;
+  word-break: break-all;
+}
+kbd {
+  display: inline-block; padding: 0 7px; border: 1px solid #9aa4ad; border-bottom-width: 2px;
+  border-radius: 5px; background: var(--bg); font-family: inherit; font-size: 14px; line-height: 1.6;
+  white-space: nowrap;
+}
+
+/* ---- 枠（下書き・要点・注意・ヒント） ---- */
+.note { border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+.note > strong:first-child { display: block; margin-bottom: 4px; }
+.note p:last-child, .note ol:last-child, .note ul:last-child { margin-bottom: 0; }
+.note.draft { background: var(--draft-bg); border-left: 5px solid var(--draft); }
+.note.draft > strong:first-child { color: var(--draft); }
+.note.warn { background: var(--warn-bg); border-left: 5px solid var(--warn); }
+.note.warn > strong:first-child { color: var(--warn); }
+.note.tip { background: var(--tip-bg); border-left: 5px solid var(--tip); }
+.note.tip > strong:first-child { color: var(--tip); }
+.note.points { background: var(--panel); border: 1px solid var(--line); }
+.note.points ol { margin: 4px 0 0; }
+
+/* ---- 番号つきの手順（番号は続けて振れるように counter-reset で始まりを指定できる） ---- */
+ol.steps { counter-reset: step; list-style: none; padding-left: 0; }
+ol.steps > li { counter-increment: step; position: relative; padding: 2px 0 10px 44px; }
+ol.steps > li::before {
+  content: counter(step); position: absolute; left: 0; top: 2px; width: 30px; height: 30px;
+  border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+@media (prefers-color-scheme: dark) { ol.steps > li::before { color: #10151b; } }
+.result { display: block; color: var(--muted); }
+.result::before { content: "→ "; }
+
+/* ---- 表 ---- */
+.table-wrap { overflow-x: auto; margin: 12px 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { border: 1px solid var(--line); padding: 7px 10px; vertical-align: top; text-align: left; }
+th { background: var(--panel); font-weight: 700; }
+thead th { white-space: nowrap; }
+tbody th { white-space: nowrap; }
+td.nowrap { white-space: nowrap; }
+.badge {
+  display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 13px; font-weight: 700;
+  white-space: nowrap; border: 1px solid currentColor;
+}
+.badge.info { color: var(--muted); }
+.badge.warn { color: var(--st-warn); }
+.badge.err { color: var(--st-err); }
+
+/* ---- 図 ---- */
+figure { margin: 16px 0 24px; }
+figcaption { font-size: 14px; color: var(--muted); margin-top: 6px; }
+.scenes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.scene { margin: 0; }
+.scene svg { display: block; width: 100%; height: auto; }
+.scene figcaption { color: var(--text); font-weight: 700; text-align: center; margin-top: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); margin-top: 8px; }
+.swatch {
+  display: inline-block; width: 16px; height: 12px; margin-right: 6px; vertical-align: -1px;
+  border: 1.5px solid var(--hl);
+  background: repeating-conic-gradient(var(--mz-1) 0 25%, var(--mz-3) 0 50%) 0 0 / 8px 8px;
+}
+
+/* 見取り図の中の色（SVG の要素に付ける） */
+.f-scr { fill: var(--scr); stroke: var(--scr-line); stroke-width: 1; }
+.f-p1 { fill: var(--p1-soft); }
+.f-p2 { fill: var(--p2-soft); }
+.f-c1 { fill: var(--p1); opacity: 0.55; }
+.f-c2 { fill: var(--p2); opacity: 0.55; }
+.f-s1 { fill: var(--p1); }
+.f-s2 { fill: var(--p2); }
+.f-stage { fill: var(--stage); }
+.f-plate { fill: var(--bg); stroke: var(--scr-line); stroke-width: 1; }
+.f-mz { fill: url(#mz); stroke: var(--hl); stroke-width: 1.6; }
+.f-big { fill: var(--muted); font-size: 40px; font-weight: 700; font-style: italic; opacity: 0.6; }
+.f-t { fill: var(--text); font-size: 13px; }
+.f-tm { fill: var(--muted); font-size: 12px; }
+.f-lab { fill: var(--hl); font-size: 16px; font-weight: 700; paint-order: stroke; stroke: var(--scr); stroke-width: 3px; }
+.f-lead { stroke: var(--hl); stroke-width: 1; fill: none; }
+.mz1 { fill: var(--mz-1); }
+.mz2 { fill: var(--mz-2); }
+.mz3 { fill: var(--mz-3); }
+.mz4 { fill: var(--mz-4); }
+
+/* ---- OBS のフィルタの画面の見取り図（HTML で描く。実際の画面とは細部が違う） ---- */
+.mock {
+  background: var(--mock-bg); color: var(--mock-text); border: 1px solid #111318; border-radius: 8px;
+  font-size: 13px; line-height: 1.5; overflow: hidden; max-width: 760px;
+}
+.mock-title { padding: 6px 12px; background: var(--mock-head); color: var(--mock-muted); font-size: 12px; }
+.mock-body { display: grid; grid-template-columns: 230px minmax(0, 1fr); }
+.mock-left { padding: 10px 12px; border-right: 1px solid var(--mock-line); }
+.mock-label { font-size: 12px; color: var(--mock-muted); margin: 2px 0 4px; }
+.mock-list {
+  background: var(--mock-panel); border: 1px solid var(--mock-line); border-radius: 4px;
+  min-height: 52px; padding: 4px;
+}
+.mock-item { display: flex; align-items: center; gap: 6px; padding: 3px 6px; border-radius: 3px; }
+.mock-item.sel { background: var(--mock-sel); }
+.mock-item svg { width: 16px; height: 16px; flex: none; }
+.mock-btns { display: flex; align-items: center; gap: 4px; margin: 6px 0 14px; flex-wrap: wrap; }
+.mbtn {
+  display: inline-flex; width: 26px; height: 22px; align-items: center; justify-content: center;
+  border: 1px solid var(--mock-line); border-radius: 4px; background: var(--mock-btn); font-weight: 700;
+}
+.mbtn.hl { outline: 2px solid #ff922b; outline-offset: 2px; }
+.callout { font-size: 12px; font-weight: 700; margin-left: 6px; }
+.callout.ok { color: #ffb366; }
+.callout.ng { color: #ff9a9a; }
+.mock-right { padding: 14px 16px; }
+.prop { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 4px 10px; margin-bottom: 10px; }
+.prop .k { color: var(--mock-muted); text-align: right; }
+.pbtn {
+  display: inline-block; padding: 1px 12px; border: 1px solid var(--mock-line); border-radius: 4px;
+  background: var(--mock-btn); white-space: nowrap;
+}
+.q {
+  display: inline-flex; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--mock-muted);
+  font-size: 11px; align-items: center; justify-content: center; margin-left: 6px; color: var(--mock-muted);
+}
+.pgroup {
+  margin: 14px 0 8px; padding-top: 8px; border-top: 1px solid var(--mock-line); color: var(--mock-muted);
+  font-size: 12px;
+}
+.pslider { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pslider .track {
+  position: relative; flex: 1 1 auto; min-width: 60px; max-width: 160px; height: 4px; border-radius: 2px;
+  background: var(--mock-line);
+}
+.pslider .knob {
+  position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%;
+  background: var(--mock-muted);
+}
+.mock-foot {
+  display: flex; justify-content: space-between; padding: 8px 12px; border-top: 1px solid var(--mock-line);
+}
+.mark {
+  display: inline-flex; width: 18px; height: 18px; border-radius: 50%; background: #ff922b; color: #1c1e25;
+  font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-left: 6px;
+  vertical-align: 1px; flex: none;
+}
+/* 本文の中で見取り図の番号を指すとき */
+.mark.inline { margin: 0 2px; }
+
+/* ---- よくある質問・困ったとき ---- */
+dl.faq dt { font-weight: 700; margin-top: 18px; }
+dl.faq dt::before { content: "Q. "; color: var(--accent); }
+dl.faq dd { margin: 4px 0 0; padding-left: 1.6em; }
+dl.faq dd::before { content: "A. "; color: var(--muted); font-weight: 700; margin-left: -1.6em; }
+dl.fix { display: grid; grid-template-columns: 4.5em minmax(0, 1fr); gap: 4px 12px; margin: 8px 0 12px; }
+dl.fix dt { font-weight: 700; color: var(--muted); }
+dl.fix dd { margin: 0; }
+dl.fix dd ol, dl.fix dd ul { margin: 0; }
+
+footer {
+  margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px;
+}
+
+/* ---- 狭い画面 ---- */
+@media (max-width: 1000px) {
+  .layout { display: block; }
+  nav.toc { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+  main { padding: 24px 16px 60px; }
+}
+@media (max-width: 700px) {
+  .scenes { grid-template-columns: 1fr; }
+  .mock-body { grid-template-columns: 1fr; }
+  .mock-left { border-right: none; border-bottom: 1px solid var(--mock-line); }
+  dl.fix { grid-template-columns: 1fr; }
+  header.cover h1 { font-size: 25px; }
+}
+
+/* ---- 印刷 ---- */
+@media print {
+  nav.toc, .skip { display: none; }
+  main { max-width: none; padding: 0; }
+  h2, h3 { break-after: avoid; }
+  figure, table, .note, .mock { break-inside: avoid; }
+}
